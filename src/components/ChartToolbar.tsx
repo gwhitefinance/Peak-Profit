@@ -205,9 +205,33 @@ export default function ChartToolbar({
       </div>
 
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="sm" className="h-8 px-3" onClick={onAlertClick}>
-          <Bell size={14} /><span className="ml-2 text-xs">Alert</span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 px-3 relative">
+              <Bell size={14} />
+              <span className="ml-2 text-xs">Alert</span>
+              <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full text-[8px] text-primary-foreground flex items-center justify-center">
+                3
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={onAlertClick}>
+              <Bell size={12} className="mr-2" />
+              Create Price Alert
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {/* Open alert management */}}>
+              📋 Manage All Alerts
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              🔔 AAPL Alert Triggered
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              🔔 TSLA Above $250
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button variant="ghost" size="sm" className="h-8 px-3">
           <Play size={14} /><span className="ml-2 text-xs">Replay</span>
         </Button>

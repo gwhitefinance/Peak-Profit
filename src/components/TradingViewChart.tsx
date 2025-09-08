@@ -91,10 +91,10 @@ export default function TradingViewChart({
         allow_symbol_change: true,
         container_id: containerRef.current.id,
         studies: selectedIndicators,
-        // More aggressive feature disabling
+        // Enhanced feature configuration for drawing tools
         disabled_features: [
           "use_localstorage_for_settings",
-          "header_widget",
+          "header_widget", 
           "header_symbol_search",
           "header_resolutions", 
           "header_chart_type",
@@ -106,17 +106,20 @@ export default function TradingViewChart({
           "header_fullscreen_button",
           "control_bar",
           "timeframes_toolbar",
-          "snapshot_trading_drawings",
-          "context_menus",
-          "main_series_scale_menu",
-          "border_around_the_chart",
           "header_saveload",
           "header_layouttabs",
-          "left_toolbar",
-          "hide_left_toolbar_by_default",
+          "border_around_the_chart",
           "chart_property_page_style",
           "property_pages",
           "show_chart_property_page"
+        ],
+        // Enable drawing tools and context menu for alerts
+        enabled_features: [
+          "left_toolbar",
+          "drawing_templates",
+          "study_templates", 
+          "snapshot_trading_drawings",
+          "context_menus"
         ],
         // Try hiding the toolbar through widget options
         hide_top_toolbar: true,
@@ -167,7 +170,30 @@ export default function TradingViewChart({
         <ContextMenuContent>
           <ContextMenuItem onClick={onAlertClick}>
             <Bell size={14} className="mr-2" />
-            Add Alert on {symbol}
+            Add Price Alert
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => {
+            // Trigger TradingView's horizontal line drawing tool
+            if (widgetRef.current && widgetRef.current.activeChart) {
+              widgetRef.current.activeChart().createShape({ type: 'horizontal_line' });
+            }
+          }}>
+            📏 Draw Horizontal Line
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => {
+            // Trigger TradingView's trend line drawing tool
+            if (widgetRef.current && widgetRef.current.activeChart) {
+              widgetRef.current.activeChart().createShape({ type: 'trend_line' });
+            }
+          }}>
+            📈 Draw Trend Line  
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => {
+            // Add alert on any drawn line at current price
+            const currentPrice = Math.random() * 200 + 100; // Mock current price
+            onAlertClick();
+          }}>
+            🔔 Add Alert on Line
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

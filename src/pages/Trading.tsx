@@ -10,6 +10,7 @@ import QuotronTicker from "@/components/QuotronTicker";
 import { mockPositions, mockPendingOrders, mockClosedPositions } from "@/lib/mockData";
 import { usePolygonWebSocket } from "@/hooks/usePolygonWebSocket";
 import { GripHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import AlertManagement from "@/components/AlertManagement";
 import IndicatorsModal from "@/components/IndicatorsModal";
 import AlertModal from "@/components/AlertModal";
 import ChartSettingsModal from "@/components/ChartSettingsModal";
