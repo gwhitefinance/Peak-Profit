@@ -1,0 +1,47 @@
+Watchlist Functional (Search + Scroll)
+	•	Type-ahead search (symbol + name), fuzzy matches OK.
+	•	Virtualized/infinite scroll, smooth on 1,000+ symbols.
+	•	Acceptance: Search results ≤150ms; scroll ≥60 FPS.
+All Ticker Symbols Work & Are Accurate
+	•	Correct mapping (stocks/crypto/futures front-month).
+	•	Prices, OHLCV, sessions match backend/feed.
+	•	Acceptance: 0 mismatches in 24h reconciliation; spot-checks within 1 tick.
+Jumbotron + Watchlist + Chart = 100% Accurate
+	•	One source of truth; identical values across components.
+	•	Acceptance: 50-tick spot-check across 10 symbols shows parity; live updates ≤500ms.
+Show Ticker Codes Next to Names (Watchlist)
+	•	Format: “Apple — AAPL”.
+	•	Acceptance: Consistent style; truncation/tooltip OK.
+Every Timeframe + Favorite Timeframes
+	•	Include full set (1s→1M). Star/Unstar; Favorites row.
+	•	Persist per user.
+	•	Acceptance: Switch re-renders ≤200ms; favorites persist after reload.
+Fullscreen: All Buttons Work
+	•	Chart/toolbar/watchlist controls functional in fullscreen.
+	•	Acceptance: QA pass on Chrome/Safari/Edge macOS+Windows; no clipped UI.
+Hide Watchlist (Small Button)
+	•	Tiny toggle at bottom of chart (TradingView-style).
+	•	Acceptance: State persists; no layout shift; works in fullscreen.
+Dashboard → Trading Logs (Enhancements)
+	•	Columns: Symbol, Entry, Exit, Size, Fees, Gross P&L, Net P&L, Holding Time, Close Reason (SL/TP/UR – User Request), Tag(s), Notes.
+	•	Filters: Date range, symbol, side, result (win/loss), reason (SL/TP/UR), account.
+	•	Actions: CSV export, per-row note/tag edit, bulk tag.
+	•	Metrics: Summary row (trades, win rate, avg win/loss, expectancy, net P&L).
+	•	Acceptance: Backend parity 1:1; timezone America/New_York; exports match visible grid; 60 FPS with pagination/virtualization.
+Monthly P&L Chart = Daily Box Grid Style
+	•	Acceptance: Monthly uses day-box grid like Daily; hover shows day P&L; totals match dashboard; closed days styled differently.
+Chart Alerts: Draw Line + Bell
+	•	Creating an alert draws a line at trigger with a small bell marker (like a position).
+	•	Draggable; context menu: edit/disable/delete; active vs triggered states.
+	•	Acceptance: Visual + behavior match; no desync with alert engine.
+Chart Color Customization
+	•	Candle/line/background/grid colors customizable.
+	•	Acceptance: Changes apply instantly; persist per user; “reset to default” available.
+Trade Journal Whiteboard: Save & Type
+	•	Save whiteboard to journal entry (image + vector where possible).
+	•	Text tool to type on whiteboard; undo/redo; autosave; PNG export.
+	•	Acceptance: Saved artifact reopens correctly in journal.
+Buy & Sell Buttons on Chart Panel
+	•	Contextual Buy/Sell near chart; hotkeys; disabled states per eval/demo rules.
+	•	Routes to sim/mock backend for now.
+	•	Acceptance: Orders logged correctly; no UI overlap.
