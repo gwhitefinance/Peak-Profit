@@ -31,3 +31,4 @@ node_modules/
 
 # Ignore the Photos Library
 **/Photos Library.photoslibrary/
+.env
