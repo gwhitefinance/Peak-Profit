@@ -141,40 +141,69 @@ export default function PLCalendar({ data }: PLCalendarProps) {
             ))}
           </div>
 
-          {/* Calendar grid */}
-          <div className="grid grid-cols-7 gap-1 flex-1">
+          {/* Enhanced Calendar Grid - Daily Box Style */}
+          <div className="grid grid-cols-7 gap-2 flex-1">
             {calendarDays.map((dayObj, index) => {
               const year = currentDate.getFullYear();
               const month = currentDate.getMonth() + 1;
               const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(dayObj.day).padStart(2, '0')}`;
               const pnl = dayObj.isCurrentMonth ? pnlDataByDate.get(dateKey) : undefined;
               const isToday = new Date().toDateString() === new Date(year, month - 1, dayObj.day).toDateString();
+              const hasData = pnl !== undefined && dayObj.isCurrentMonth;
 
               return (
                 <div
                   key={index}
                   className={cn(
-                    "h-full flex flex-col items-center justify-start p-1 rounded-md transition-all duration-200 cursor-pointer hover:bg-accent/50 border",
-                    dayObj.isCurrentMonth ? "border-transparent" : "border-transparent",
-                    pnl !== undefined 
-                      ? (pnl > 0 ? "bg-green-500/10" : pnl < 0 ? "bg-red-500/10" : "bg-blue-500/10") 
-                      : "bg-transparent",
-                    isToday && dayObj.isCurrentMonth && "border-primary"
+                    "aspect-square flex flex-col justify-between p-2 rounded-lg border transition-all duration-200 cursor-pointer hover:scale-105 group relative",
+                    dayObj.isCurrentMonth 
+                      ? "border-border bg-card hover:bg-accent/30" 
+                      : "border-muted/30 bg-muted/10",
+                    hasData && pnl > 0 && "bg-green-500/10 border-green-500/30 hover:bg-green-500/20",
+                    hasData && pnl < 0 && "bg-red-500/10 border-red-500/30 hover:bg-red-500/20",
+                    hasData && pnl === 0 && "bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20",
+                    isToday && dayObj.isCurrentMonth && "ring-2 ring-primary/50"
                   )}
                 >
-                  <span className={cn(
-                    "text-xs font-semibold mb-1", 
-                    dayObj.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground/30'
+                  <div className={cn(
+                    "text-sm font-bold text-center", 
+                    dayObj.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground/40',
+                    isToday && 'text-primary'
                   )}>
                     {dayObj.day}
-                  </span>
-                  {pnl !== undefined && dayObj.isCurrentMonth && (
-                     <span className={cn(
-                      "text-xs font-bold", 
-                      pnl > 0 ? "text-green-500" : pnl < 0 ? "text-red-500" : "text-blue-400"
-                     )}>
-                      {pnl > 0 ? `+$${pnl}` : pnl < 0 ? `-$${Math.abs(pnl)}` : `$${pnl}`}
-                     </span>
+                  </div>
+                  
+                  {hasData && (
+                    <div className="flex flex-col items-center">
+                      <div className={cn(
+                        "text-xs font-bold leading-none text-center", 
+                        pnl > 0 ? "text-green-400" : pnl < 0 ? "text-red-400" : "text-blue-400"
+                      )}>
+                        {pnl > 0 ? '+' : ''}${Math.abs(pnl) >= 1000 ? `${(pnl/1000).toFixed(1)}k` : pnl.toFixed(0)}
+                      </div>
+                      {Math.abs(pnl) >= 100 && (
+                        <div className={cn(
+                          "w-2 h-1 rounded-full mt-1",
+                          pnl > 0 ? "bg-green-400" : "bg-red-400"
+                        )} />
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Enhanced Tooltip */}
+                  {hasData && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-lg border border-border shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 whitespace-nowrap">
+                      <div className="font-semibold">{dateKey}</div>
+                      <div className={cn(
+                        "font-bold text-lg",
+                        pnl > 0 ? "text-green-400" : pnl < 0 ? "text-red-400" : "text-blue-400"
+                      )}>
+                        {pnl > 0 ? '+' : ''}${pnl.toFixed(2)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {pnl > 0 ? 'Profitable Day' : pnl < 0 ? 'Loss Day' : 'Breakeven Day'}
+                      </div>
+                    </div>
                   )}
                 </div>
               );
@@ -182,38 +211,106 @@ export default function PLCalendar({ data }: PLCalendarProps) {
           </div>
         </>
       ) : (
-        <div className="grid grid-cols-3 gap-2 flex-1 items-stretch">
-          {monthNames.map((monthName, index) => {
-            const year = currentDate.getFullYear();
-            const monthKey = `${year}-${String(index + 1).padStart(2, '0')}`;
-            const monthlyPnl = monthlyPnlData.get(monthKey);
-            const isPositive = (monthlyPnl || 0) > 0;
-            const hasData = monthlyPnl !== undefined;
-
-            return (
-              <div 
-                key={monthName}
-                className={cn(
-                  "flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 cursor-pointer text-center",
-                  hasData 
-                    ? (isPositive ? "bg-green-500/10 hover:bg-green-500/20" : "bg-red-500/10 hover:bg-red-500/20") 
-                    : "bg-muted/10 hover:bg-muted/20",
-                )}
-              >
-                <div className="text-sm font-medium text-foreground mb-1">{monthName.substring(0, 3)}</div>
-                {hasData ? (
-                  <div className={cn(
-                    "text-sm font-bold", 
-                    isPositive ? "text-green-500" : "text-red-500"
-                  )}>
-                    {isPositive ? `+$${monthlyPnl}` : `-$${Math.abs(monthlyPnl || 0)}`}
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">--</div>
-                )}
+        <div className="space-y-6 flex-1">
+          {/* Monthly Summary Stats */}
+          <div className="grid grid-cols-4 gap-4 p-4 bg-secondary/20 rounded-lg">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">
+                {Array.from(monthlyPnlData.values()).reduce((sum, pnl) => sum + pnl, 0).toFixed(0)}
               </div>
-            );
-          })}
+              <div className="text-xs text-muted-foreground">Year Total</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">
+                {Array.from(monthlyPnlData.values()).filter(pnl => pnl > 0).length}
+              </div>
+              <div className="text-xs text-muted-foreground">Profitable Months</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">
+                {Math.max(...Array.from(monthlyPnlData.values()), 0).toFixed(0)}
+              </div>
+              <div className="text-xs text-muted-foreground">Best Month</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-400">
+                {Math.min(...Array.from(monthlyPnlData.values()), 0).toFixed(0)}
+              </div>
+              <div className="text-xs text-muted-foreground">Worst Month</div>
+            </div>
+          </div>
+          
+          {/* Monthly Grid */}
+          <div className="grid grid-cols-3 gap-4 flex-1">
+            {monthNames.map((monthName, index) => {
+              const year = currentDate.getFullYear();
+              const monthKey = `${year}-${String(index + 1).padStart(2, '0')}`;
+              const monthlyPnl = monthlyPnlData.get(monthKey);
+              const isPositive = (monthlyPnl || 0) > 0;
+              const hasData = monthlyPnl !== undefined;
+              const currentMonth = new Date().getMonth() === index && new Date().getFullYear() === year;
+
+              return (
+                <div 
+                  key={monthName}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-200 cursor-pointer text-center hover:scale-105 group relative",
+                    hasData 
+                      ? (isPositive ? "bg-green-500/10 border-green-500/30 hover:bg-green-500/20" : "bg-red-500/10 border-red-500/30 hover:bg-red-500/20") 
+                      : "bg-muted/10 border-muted/30 hover:bg-muted/20",
+                    currentMonth && "ring-2 ring-primary/50"
+                  )}
+                  onClick={() => setCurrentDate(new Date(year, index, 1))}
+                >
+                  <div className="text-lg font-semibold text-foreground mb-2">{monthName}</div>
+                  {hasData ? (
+                    <div className={cn(
+                      "text-xl font-bold", 
+                      isPositive ? "text-green-400" : "text-red-400"
+                    )}>
+                      {isPositive ? '+' : ''}${Math.abs(monthlyPnl).toFixed(0)}
+                    </div>
+                  ) : (
+                    <div className="text-xl text-muted-foreground">--</div>
+                  )}
+                  
+                  {/* Performance Indicator */}
+                  {hasData && (
+                    <div className={cn(
+                      "w-full h-2 rounded-full mt-2",
+                      isPositive ? "bg-green-400/20" : "bg-red-400/20"
+                    )}>
+                      <div 
+                        className={cn(
+                          "h-full rounded-full transition-all duration-500",
+                          isPositive ? "bg-green-400" : "bg-red-400"
+                        )}
+                        style={{ 
+                          width: `${Math.min(Math.abs(monthlyPnl) / Math.max(...Array.from(monthlyPnlData.values()).map(v => Math.abs(v)), 1) * 100, 100)}%` 
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Hover tooltip for monthly details */}
+                  {hasData && (
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-lg border border-border shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 whitespace-nowrap">
+                      <div className="font-semibold">{monthName} {year}</div>
+                      <div className={cn(
+                        "font-bold text-lg",
+                        isPositive ? "text-green-400" : "text-red-400"
+                      )}>
+                        {isPositive ? '+' : ''}${monthlyPnl.toFixed(2)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Click to view daily breakdown
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
