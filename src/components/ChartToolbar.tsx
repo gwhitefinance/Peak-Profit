@@ -1,4 +1,5 @@
 // src/components/ChartToolbar.tsx
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
   CandlestickChart, 
@@ -13,7 +14,10 @@ import {
   Activity,
   BarChart3,
   Square,
-  Mountain
+  Mountain,
+  Star,
+  Clock,
+  Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +51,8 @@ export default function ChartToolbar({
   chartStyle,
   onChartStyleChange
 }: ChartToolbarProps) {
+  const [favoriteTimeframes, setFavoriteTimeframes] = useState<string[]>(["1m", "5m", "15m", "1h", "4h", "1D", "1W"]);
+  const [showAllTimeframes, setShowAllTimeframes] = useState(false);
   const chartStyleOptions = [
     // Candle Types
     { id: "1", label: "Candles", icon: <CandlestickChart size={16} />, category: "Candles" },
@@ -77,7 +83,38 @@ export default function ChartToolbar({
     { id: "17", label: "Volume footprint", icon: <BarChart3 size={16} />, category: "Special" },
   ];
   
-  const timeframes = ["1m", "5m", "15m", "1h", "4h", "1D", "1W"];
+  const allTimeframes = [
+    { id: "1S", label: "1s", category: "seconds" },
+    { id: "5S", label: "5s", category: "seconds" },
+    { id: "10S", label: "10s", category: "seconds" },
+    { id: "15S", label: "15s", category: "seconds" },
+    { id: "30S", label: "30s", category: "seconds" },
+    { id: "1m", label: "1m", category: "minutes" },
+    { id: "3m", label: "3m", category: "minutes" },
+    { id: "5m", label: "5m", category: "minutes" },
+    { id: "15m", label: "15m", category: "minutes" },
+    { id: "30m", label: "30m", category: "minutes" },
+    { id: "1h", label: "1h", category: "hours" },
+    { id: "2h", label: "2h", category: "hours" },
+    { id: "4h", label: "4h", category: "hours" },
+    { id: "6h", label: "6h", category: "hours" },
+    { id: "8h", label: "8h", category: "hours" },
+    { id: "12h", label: "12h", category: "hours" },
+    { id: "1D", label: "1D", category: "daily" },
+    { id: "3D", label: "3D", category: "daily" },
+    { id: "1W", label: "1W", category: "weekly" },
+    { id: "1M", label: "1M", category: "monthly" }
+  ];
+  
+  const displayTimeframes = showAllTimeframes ? allTimeframes.map(tf => tf.id) : favoriteTimeframes;
+  
+  const toggleFavoriteTimeframe = (tf: string) => {
+    setFavoriteTimeframes(prev => 
+      prev.includes(tf) 
+        ? prev.filter(t => t !== tf)
+        : [...prev, tf]
+    );
+  };
   const CurrentIcon = chartStyleOptions.find(s => s.id === chartStyle)?.icon || <CandlestickChart size={16} />;
 
   // Group chart styles by category
@@ -94,17 +131,44 @@ export default function ChartToolbar({
       <div className="flex items-center gap-1">
         <div className="px-2 font-bold text-sm text-foreground">{symbol}</div>
         
-        {timeframes.map(tf => (
-          <Button
-            key={tf}
-            variant="ghost"
-            size="sm"
-            className={cn("h-8 px-2 text-xs", timeframe === tf && "bg-accent text-accent-foreground")}
-            onClick={() => onTimeframeChange(tf)}
-          >
-            {tf}
-          </Button>
+        {displayTimeframes.map(tf => (
+          <div key={tf} className="relative group">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn("h-8 px-2 text-xs", timeframe === tf && "bg-accent text-accent-foreground")}
+              onClick={() => onTimeframeChange(tf)}
+            >
+              {tf}
+              {favoriteTimeframes.includes(tf) && (
+                <Star size={8} className="absolute -top-0.5 -right-0.5 fill-yellow-400 text-yellow-400" />
+              )}
+            </Button>
+            {showAllTimeframes && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute -top-1 -right-1 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavoriteTimeframe(tf);
+                }}
+              >
+                <Star size={8} className={cn(favoriteTimeframes.includes(tf) ? "fill-yellow-400 text-yellow-400" : "")} />
+              </Button>
+            )}
+          </div>
         ))}
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setShowAllTimeframes(!showAllTimeframes)}
+          title={showAllTimeframes ? "Show favorites only" : "Show all timeframes"}
+        >
+          {showAllTimeframes ? <Star size={14} /> : <Plus size={14} />}
+        </Button>
         
         <div className="h-5 w-px bg-border/50 mx-2" />
 

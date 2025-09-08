@@ -233,8 +233,8 @@ export default function TradeLockerWatchlist({ onSelectSymbol, selectedSymbol }:
                   {getSymbolIcon(item.symbol)}
                 </div>
                 <div>
-                  <div className="font-medium text-foreground">{item.symbol}</div>
-                  <div className="text-xs text-muted-foreground">{item.name}</div>
+                  <div className="font-medium text-foreground">{item.name} — {item.symbol}</div>
+                  <div className="text-xs text-muted-foreground">Click to select</div>
                 </div>
               </div>
             ))
@@ -258,8 +258,8 @@ export default function TradeLockerWatchlist({ onSelectSymbol, selectedSymbol }:
                           className="pl-12 pr-3 py-2.5 border-t border-border/20 hover:bg-accent/30 cursor-pointer"
                           onClick={() => handleSymbolSelect(item.symbol)}
                         >
-                          <div className="font-medium text-foreground">{item.symbol}</div>
-                          <div className="text-xs text-muted-foreground">{item.name}</div>
+                          <div className="font-medium text-foreground">{item.name} — {item.symbol}</div>
+                          <div className="text-xs text-muted-foreground">Click to select</div>
                         </div>
                       ))}
                     </AccordionContent>
@@ -312,7 +312,7 @@ export default function TradeLockerWatchlist({ onSelectSymbol, selectedSymbol }:
                           {getSymbolIcon(item.symbol)}
                         </div>
                         <div>
-                        <div className="font-medium text-foreground">{item.symbol}</div>
+                        <div className="font-medium text-foreground">{item.name} — {item.symbol}</div>
                         <div className="text-xs text-muted-foreground font-mono">
                             H: {high.toFixed(2)} L: {low.toFixed(2)}
                         </div>

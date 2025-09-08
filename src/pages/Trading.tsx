@@ -9,7 +9,7 @@ import ChartToolbar from "@/components/ChartToolbar";
 import QuotronTicker from "@/components/QuotronTicker";
 import { mockPositions, mockPendingOrders, mockClosedPositions } from "@/lib/mockData";
 import { usePolygonWebSocket } from "@/hooks/usePolygonWebSocket";
-import { GripHorizontal } from "lucide-react";
+import { GripHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import IndicatorsModal from "@/components/IndicatorsModal";
 import AlertModal from "@/components/AlertModal";
 import ChartSettingsModal from "@/components/ChartSettingsModal";
@@ -29,6 +29,7 @@ interface ChartSettings {
 export default function Trading() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
   const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
+  const [watchlistVisible, setWatchlistVisible] = useState(true);
   const { quotes, subscribeToSymbol, unsubscribeFromSymbol } = usePolygonWebSocket();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +80,7 @@ export default function Trading() {
           <PanelGroup direction="vertical" className="h-full">
             <Panel defaultSize={75} minSize={50}>
               <div ref={chartContainerRef} className="h-full flex bg-background relative">
-                <div className="flex-1 h-full flex flex-col">
+                <div className="flex-1 h-full flex flex-col relative">
                   <div className="flex-1 h-full w-full relative">
                     <ChartToolbar 
                       symbol={selectedSymbol}
@@ -101,10 +102,20 @@ export default function Trading() {
                      
                     />
                   </div>
+                  {/* Hide Watchlist Toggle Button - TradingView Style */}
+                  <button
+                    onClick={() => setWatchlistVisible(!watchlistVisible)}
+                    className="absolute bottom-4 right-2 bg-card border border-border rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-sm z-10"
+                    title={watchlistVisible ? "Hide watchlist" : "Show watchlist"}
+                  >
+                    {watchlistVisible ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+                  </button>
                 </div>
-                <div className="w-1/4 h-full max-w-[320px] min-w-[280px] border-l border-border">
-                  <TradeLockerWatchlist onSelectSymbol={setSelectedSymbol} />
-                </div>
+                {watchlistVisible && (
+                  <div className="w-1/4 h-full max-w-[320px] min-w-[280px] border-l border-border transition-all duration-200">
+                    <TradeLockerWatchlist onSelectSymbol={setSelectedSymbol} />
+                  </div>
+                )}
               </div>
             </Panel>
             <PanelResizeHandle className="group relative">
