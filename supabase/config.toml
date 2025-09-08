@@ -1,0 +1,19 @@
+project_id = "shcaeyagtzmumqpyzpyw"
+
+[functions.alpaca-search]
+verify_jwt = false
+
+[functions.alpaca-quotes]
+verify_jwt = false
+
+[functions.alpaca-order]
+verify_jwt = false
+
+[functions.mock-search]
+verify_jwt = false
+
+[functions.mock-quotes]
+verify_jwt = false
+
+[functions.polygon-history]
+verify_jwt = false
