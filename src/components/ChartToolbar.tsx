@@ -11,6 +11,7 @@ import {
   Play, 
   Settings, 
   Maximize,
+  Minimize,
   Activity,
   BarChart3,
   Square,
@@ -36,6 +37,7 @@ interface ChartToolbarProps {
   onAlertClick: () => void;
   onSettingsClick: () => void;
   onFullscreenClick: () => void;
+  isFullscreen?: boolean;
   chartStyle: string;
   onChartStyleChange: (style: string) => void;
 }
@@ -48,6 +50,7 @@ export default function ChartToolbar({
   onAlertClick,
   onSettingsClick,
   onFullscreenClick,
+  isFullscreen = false,
   chartStyle,
   onChartStyleChange
 }: ChartToolbarProps) {
@@ -238,8 +241,14 @@ export default function ChartToolbar({
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onSettingsClick}>
           <Settings size={14} />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onFullscreenClick}>
-          <Maximize size={14} />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8" 
+          onClick={onFullscreenClick}
+          title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        >
+          {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
         </Button>
       </div>
     </div>

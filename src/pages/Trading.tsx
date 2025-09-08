@@ -34,6 +34,7 @@ export default function Trading() {
   const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
   const [watchlistVisible, setWatchlistVisible] = useState(true);
   const [tradingPanelVisible, setTradingPanelVisible] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const { quotes, subscribeToSymbol, unsubscribeFromSymbol } = usePolygonWebSocket();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -68,8 +69,33 @@ export default function Trading() {
     setShowIndicatorsModal(false);
   };
 
-  const handleFullScreen = () => {
-    chartContainerRef.current?.requestFullscreen();
+  const handleFullScreen = async () => {
+    if (!chartContainerRef.current) return;
+    
+    try {
+      // Check if already in fullscreen
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        const element = chartContainerRef.current;
+        
+        // Try different browser implementations
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if ((element as any).webkitRequestFullscreen) {
+          // Safari
+          await (element as any).webkitRequestFullscreen();
+        } else if ((element as any).msRequestFullscreen) {
+          // IE/Edge
+          await (element as any).msRequestFullscreen();
+        } else if ((element as any).mozRequestFullScreen) {
+          // Firefox
+          await (element as any).mozRequestFullScreen();
+        }
+      }
+    } catch (error) {
+      console.warn('Fullscreen request failed:', error);
+    }
   };
 
   const handleTrade = async (order: any) => {
@@ -90,6 +116,30 @@ export default function Trading() {
   const currentQuote = quotes.get(selectedSymbol);
   const currentPrice = currentQuote?.lastPrice || 0;
 
+  useEffect(() => {
+    // Track fullscreen changes for all browsers
+    const handleFullscreenChange = () => {
+      setIsFullscreen(
+        !!(document.fullscreenElement || 
+           (document as any).webkitFullscreenElement || 
+           (document as any).msFullscreenElement || 
+           (document as any).mozFullScreenElement)
+      );
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
@@ -109,6 +159,7 @@ export default function Trading() {
                       onAlertClick={() => setShowAlertModal(true)}
                       onSettingsClick={() => setShowSettingsModal(true)}
                       onFullscreenClick={handleFullScreen}
+                      isFullscreen={isFullscreen}
                       chartStyle={chartStyle}
                       onChartStyleChange={setChartStyle}
                     />
