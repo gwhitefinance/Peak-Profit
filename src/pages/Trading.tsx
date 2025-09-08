@@ -11,6 +11,8 @@ import { mockPositions, mockPendingOrders, mockClosedPositions } from "@/lib/moc
 import { usePolygonWebSocket } from "@/hooks/usePolygonWebSocket";
 import { GripHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import AlertManagement from "@/components/AlertManagement";
+import TradingPanel from "@/components/TradingPanel";
+import QuickTradePanel from "@/components/QuickTradePanel";
 import IndicatorsModal from "@/components/IndicatorsModal";
 import AlertModal from "@/components/AlertModal";
 import ChartSettingsModal from "@/components/ChartSettingsModal";
@@ -31,6 +33,7 @@ export default function Trading() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
   const [selectedTimeframe, setSelectedTimeframe] = useState("1D");
   const [watchlistVisible, setWatchlistVisible] = useState(true);
+  const [tradingPanelVisible, setTradingPanelVisible] = useState(true);
   const { quotes, subscribeToSymbol, unsubscribeFromSymbol } = usePolygonWebSocket();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +72,21 @@ export default function Trading() {
     chartContainerRef.current?.requestFullscreen();
   };
 
+  const handleTrade = async (order: any) => {
+    // Simulate backend API call
+    console.log('Submitting trade order:', order);
+    
+    // Mock API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Simulate success/failure
+    if (Math.random() > 0.1) { // 90% success rate
+      return { success: true, orderId: `ORD-${Date.now()}` };
+    } else {
+      throw new Error('Insufficient buying power');
+    }
+  };
+
   const currentQuote = quotes.get(selectedSymbol);
   const currentPrice = currentQuote?.lastPrice || 0;
 
@@ -103,6 +121,18 @@ export default function Trading() {
                      
                     />
                   </div>
+                  
+                  {/* Quick Trade Panel */}
+                  {tradingPanelVisible && (
+                    <div className="absolute bottom-4 left-4 z-20">
+                      <QuickTradePanel
+                        symbol={selectedSymbol}
+                        currentPrice={currentPrice}
+                        onTrade={handleTrade}
+                      />
+                    </div>
+                  )}
+                  
                   {/* Hide Watchlist Toggle Button - TradingView Style */}
                   <button
                     onClick={() => setWatchlistVisible(!watchlistVisible)}
@@ -110,6 +140,15 @@ export default function Trading() {
                     title={watchlistVisible ? "Hide watchlist" : "Show watchlist"}
                   >
                     {watchlistVisible ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+                  </button>
+                  
+                  {/* Hide Trading Panel Toggle */}
+                  <button
+                    onClick={() => setTradingPanelVisible(!tradingPanelVisible)}
+                    className="absolute bottom-16 right-2 bg-card border border-border rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-sm z-10"
+                    title={tradingPanelVisible ? "Hide trading panel" : "Show trading panel"}
+                  >
+                    📊
                   </button>
                 </div>
                 {watchlistVisible && (
