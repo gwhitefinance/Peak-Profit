@@ -47,7 +47,9 @@ export const usePolygonWebSocket = () => {
         console.log('Initializing Polygon WebSocket connection...');
         
         // Get API key from Supabase secrets via edge function
-        const { data, error } = await supabase.functions.invoke('get-polygon-credentials');
+        const response = await fetch('/api/get-polygon-credentials');
+        const data = await response.json();
+        const error = !response.ok ? { message: data.error || 'Request failed' } : null;
         
         if (error || !data?.apiKey) {
           console.error('Polygon API key not available:', error);

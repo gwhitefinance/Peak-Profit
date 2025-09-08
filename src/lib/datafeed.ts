@@ -47,14 +47,18 @@ export const createDatafeed = () => ({
         console.log('[getBars]: Method call for history', symbolInfo.name, resolution);
 
         try {
-            const { data, error } = await supabase.functions.invoke('polygon-history', {
-                body: {
+            const response = await fetch('/api/polygon-history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     symbol: symbolInfo.name,
                     from: Math.round(from * 1000),
                     to: Math.round(to * 1000),
                     resolution: resolution
-                }
+                })
             });
+            const data = await response.json();
+            const error = !response.ok ? { message: data.error || 'Request failed' } : null;
 
             if (error) {
                 console.error('History fetch error:', error);

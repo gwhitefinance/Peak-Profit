@@ -51,9 +51,13 @@ export const useMarketData = () => {
     if (symbols.length === 0) return;
     
     try {
-      const { data, error } = await supabase.functions.invoke('alpaca-quotes', {
-        body: { symbols }
+      const response = await fetch('/api/alpaca-quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbols })
       });
+      const data = await response.json();
+      const error = !response.ok ? { message: data.error || 'Request failed' } : null;
 
       if (error) {
         console.error('Error fetching quotes:', error);
@@ -102,9 +106,13 @@ export const useMarketData = () => {
     if (query.length < 2) return [];
     
     try {
-      const { data, error } = await supabase.functions.invoke('alpaca-search', {
-        body: { query }
+      const response = await fetch('/api/alpaca-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
       });
+      const data = await response.json();
+      const error = !response.ok ? { message: data.error || 'Request failed' } : null;
 
       if (error) {
         console.error('Error searching stocks:', error);
@@ -130,9 +138,13 @@ export const useMarketData = () => {
     stop_price?: number;
   }) => {
     try {
-      const { data, error } = await supabase.functions.invoke('alpaca-order', {
-        body: orderData
+      const response = await fetch('/api/alpaca-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
       });
+      const data = await response.json();
+      const error = !response.ok ? { message: data.error || 'Request failed' } : null;
 
       if (error) {
         console.error('Error placing order:', error);

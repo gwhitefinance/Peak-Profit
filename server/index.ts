@@ -320,9 +320,11 @@ app.get('/api/get-polygon-credentials', async (req, res) => {
 app.use(express.static('dist'));
 
 // Handle client-side routing - serve index.html for all non-API routes
-app.get('*', (req, res) => {
+app.use((req, res) => {
   if (!req.path.startsWith('/api')) {
     res.sendFile(path.join(process.cwd(), 'dist', 'index.html'));
+  } else {
+    res.status(404).json({ error: 'API endpoint not found' });
   }
 });
 
