@@ -281,7 +281,7 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
               <th className="w-8 px-2 py-3">
                 <input
                   type="checkbox"
-                  checked={selectedLogs.length === filteredLogs.length}
+                  checked={selectedLogs.length > 0 && selectedLogs.length === filteredLogs.length}
                   onChange={(e) => {
                     if (e.target.checked) {
                       setSelectedLogs(filteredLogs.map(log => log.id));
@@ -326,22 +326,22 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{log.symbol}</span>
                     <Badge variant={log.side === 'buy' ? 'default' : 'secondary'} className="text-xs">
-                      {log.side.toUpperCase()}
+                      {log.side?.toUpperCase()}
                     </Badge>
                   </div>
                 </td>
-                <td className="px-3 py-3 text-right text-sm font-mono">${log.entry.toFixed(2)}</td>
+                <td className="px-3 py-3 text-right text-sm font-mono">${(log.entry ?? 0).toFixed(2)}</td>
                 <td className="px-3 py-3 text-right text-sm font-mono">
                   {log.exit ? `$${log.exit.toFixed(2)}` : '-'}
                 </td>
                 <td className="px-3 py-3 text-right text-sm">{log.size}</td>
-                <td className="px-3 py-3 text-right text-sm text-muted-foreground">${log.fees.toFixed(2)}</td>
+                <td className="px-3 py-3 text-right text-sm text-muted-foreground">${(log.fees ?? 0).toFixed(2)}</td>
                 <td className="px-3 py-3 text-right">
                   <span className={cn(
                     "text-sm font-medium",
                     log.grossPnl >= 0 ? "text-green-400" : "text-red-400"
                   )}>
-                    ${log.grossPnl.toFixed(0)}
+                    ${(log.grossPnl ?? 0).toFixed(0)}
                   </span>
                 </td>
                 <td className="px-3 py-3 text-right">
@@ -353,7 +353,7 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
                       ? <ArrowUpRight size={12} /> 
                       : <ArrowDownRight size={12} />
                     }
-                    <span className="ml-1">${Math.abs(log.netPnl).toFixed(0)}</span>
+                    <span className="ml-1">${Math.abs(log.netPnl ?? 0).toFixed(0)}</span>
                   </div>
                 </td>
                 <td className="px-3 py-3 text-center text-xs text-muted-foreground">{log.holdingTime}</td>
@@ -366,7 +366,7 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
                 </td>
                 <td className="px-3 py-3">
                   <div className="flex flex-wrap gap-1">
-                    {log.tags.map((tag, idx) => (
+                    {(log.tags ?? []).map((tag, idx) => (
                       <Badge key={idx} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>
@@ -381,7 +381,11 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => setEditingLog(log)}>
+                      <DropdownMenuItem onClick={() => {
+                        setEditingLog(log);
+                        setNewNote(log.notes);
+                        setNewTags(log.tags.join(', '));
+                      }}>
                         <Edit size={12} className="mr-2" />
                         Edit Note/Tags
                       </DropdownMenuItem>
@@ -421,7 +425,7 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
               <Textarea
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                placeholder={editingLog?.notes || "Add notes about this trade..."}
+                placeholder="Add notes about this trade..."
                 rows={3}
               />
             </div>
@@ -430,7 +434,7 @@ export default function TradingLogs({ logs }: TradingLogsProps) {
               <Input
                 value={newTags}
                 onChange={(e) => setNewTags(e.target.value)}
-                placeholder={editingLog?.tags.join(', ') || "swing, breakout, earnings..."}
+                placeholder="swing, breakout, earnings..."
               />
             </div>
             <div className="flex justify-end gap-2">
